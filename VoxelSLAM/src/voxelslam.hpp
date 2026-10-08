@@ -6,6 +6,8 @@
 #include "feature_point.hpp"
 #include "loop_refine.hpp"
 #include <mutex>
+#include <algorithm>
+#include <utility>
 #include <Eigen/Eigenvalues>
 #include "ros_utils.h"
 
@@ -26,6 +28,7 @@ using namespace std;
 
 PointCloud2Publisher pub_scan, pub_cmap, pub_init, pub_pmap;
 PointCloud2Publisher pub_test, pub_prev_path, pub_curr_path;
+PathPublisher pub_path;
 ImuSubscriber sub_imu;
 LivoxSubscriber sub_livox;
 PointCloud2Subscriber sub_pcl;
@@ -38,6 +41,41 @@ void pub_pl_func(T &pl, PointCloud2Publisher &pub)
   pcl::toROSMsg(pl, output);
   output.header.frame_id = "camera_init";
   output.header.stamp = ros_now();
+  ros_publish(pub, output);
+}
+
+void pub_path_func(const pcl::PointCloud<PointType> &pl, PathPublisher &pub)
+{
+  static size_t publish_count = 0;
+  if (publish_count++ % 10 != 0)
+    return;
+
+  PathMsg output;
+  output.header.frame_id = "camera_init";
+  output.header.stamp = ros_now();
+
+  const size_t max_poses = 10000;
+  const size_t stride = std::max<size_t>(1, (pl.size() + max_poses - 1) / max_poses);
+  for (size_t i = 0; i < pl.size(); i += stride)
+  {
+    PoseStampedMsg pose;
+    pose.header = output.header;
+    pose.pose.position.x = pl.points[i].x;
+    pose.pose.position.y = pl.points[i].y;
+    pose.pose.position.z = pl.points[i].z;
+    pose.pose.orientation.w = 1.0;
+    output.poses.push_back(std::move(pose));
+  }
+  if (!pl.empty() && (pl.size() - 1) % stride != 0)
+  {
+    PoseStampedMsg pose;
+    pose.header = output.header;
+    pose.pose.position.x = pl.points.back().x;
+    pose.pose.position.y = pl.points.back().y;
+    pose.pose.position.z = pl.points.back().z;
+    pose.pose.orientation.w = 1.0;
+    output.poses.push_back(std::move(pose));
+  }
   ros_publish(pub, output);
 }
 

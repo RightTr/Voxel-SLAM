@@ -4,7 +4,7 @@ General:
   save_path: "/home/zale/save_datas/"
   previous_map: ""
   bagname: "mid360_init"
-  lidar_type: 0
+  lidar_type: 8 # 8 selects Livox PointCloud2; 0 uses Livox CustomMsg
   blind: 0.5 # 0.5
   point_filter_num: 3
   extrinsic_tran: [-0.011, -0.02329, 0.04412]

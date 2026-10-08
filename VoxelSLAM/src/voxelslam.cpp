@@ -34,6 +34,7 @@ public:
       pcl_send.push_back(ap);
     }
     pub_pl_func(pcl_send, pub_scan);
+    pub_path_func(pcl_path, pub_path);
     
     Eigen::Vector3d pcurr = x_curr.p;
 
@@ -75,6 +76,7 @@ public:
 
     pub_pl_func(pcl_path, pub_curr_path);
     pub_pl_func(pcl_send, pub_cmap);
+    pub_path_func(pcl_path, pub_path);
   }
 
   void pub_global_path(vector<vector<ScanPose*>*> &relc_bl_buf, PointCloud2Publisher &pub_relc, vector<int> &ids)
@@ -1139,6 +1141,7 @@ public:
     }
 
     pub_pl_func(pcl_path, pub_curr_path);
+    pub_path_func(pcl_path, pub_path);
 
     x_curr.R = x_buf[win_count-1].R;
     x_curr.p = x_buf[win_count-1].p;
@@ -2603,6 +2606,7 @@ int main(int argc, char **argv)
   pub_test = create_publisher<PointCloud2Msg>("/map_test", 100);
   pub_curr_path = create_publisher<PointCloud2Msg>("/map_path", 100);
   pub_prev_path = create_publisher<PointCloud2Msg>("/map_true", 100);
+  pub_path = create_publisher<PathMsg>("/path", 10);
   
   VOXEL_SLAM vs(n);
   mp = new int[vs.win_size];

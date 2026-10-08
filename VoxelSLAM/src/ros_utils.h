@@ -11,18 +11,23 @@
 #include <ros/ros.h>
 #include <sensor_msgs/Imu.h>
 #include <sensor_msgs/PointCloud2.h>
+#include <nav_msgs/Path.h>
+#include <geometry_msgs/PoseStamped.h>
 #include <livox_ros_driver2/CustomMsg.h>
 #include <tf/transform_broadcaster.h>
 
 using RosNode = ros::NodeHandle;
 using ImuMsg = sensor_msgs::Imu;
 using PointCloud2Msg = sensor_msgs::PointCloud2;
+using PathMsg = nav_msgs::Path;
+using PoseStampedMsg = geometry_msgs::PoseStamped;
 using LivoxMsg = livox_ros_driver2::CustomMsg;
 using ImuMsgPtr = ImuMsg::Ptr;
 using ImuMsgConstPtr = ImuMsg::ConstPtr;
 using PointCloud2MsgConstPtr = PointCloud2Msg::ConstPtr;
 using LivoxMsgConstPtr = LivoxMsg::ConstPtr;
 using PointCloud2Publisher = ros::Publisher;
+using PathPublisher = ros::Publisher;
 using ImuSubscriber = ros::Subscriber;
 using PointCloud2Subscriber = ros::Subscriber;
 using LivoxSubscriber = ros::Subscriber;
@@ -61,6 +66,9 @@ inline ros::Subscriber create_sensor_subscriber(const std::string &topic, size_t
 inline void ros_publish(PointCloud2Publisher &publisher, const PointCloud2Msg &message) {
   publisher.publish(message);
 }
+inline void ros_publish(PathPublisher &publisher, const PathMsg &message) {
+  publisher.publish(message);
+}
 
 inline void publish_transform(const Eigen::Vector3d &position, const Eigen::Quaterniond &orientation,
                               const std::string &parent, const std::string &child) {
@@ -76,6 +84,8 @@ inline void publish_transform(const Eigen::Vector3d &position, const Eigen::Quat
 #include <builtin_interfaces/msg/time.hpp>
 #include <sensor_msgs/msg/imu.hpp>
 #include <sensor_msgs/msg/point_cloud2.hpp>
+#include <nav_msgs/msg/path.hpp>
+#include <geometry_msgs/msg/pose_stamped.hpp>
 #include <livox_ros_driver2/msg/custom_msg.hpp>
 #include <geometry_msgs/msg/transform_stamped.hpp>
 #include <tf2_ros/transform_broadcaster.h>
@@ -83,12 +93,15 @@ inline void publish_transform(const Eigen::Vector3d &position, const Eigen::Quat
 using RosNode = rclcpp::Node::SharedPtr;
 using ImuMsg = sensor_msgs::msg::Imu;
 using PointCloud2Msg = sensor_msgs::msg::PointCloud2;
+using PathMsg = nav_msgs::msg::Path;
+using PoseStampedMsg = geometry_msgs::msg::PoseStamped;
 using LivoxMsg = livox_ros_driver2::msg::CustomMsg;
 using ImuMsgPtr = ImuMsg::SharedPtr;
 using ImuMsgConstPtr = ImuMsg::ConstSharedPtr;
 using PointCloud2MsgConstPtr = PointCloud2Msg::ConstSharedPtr;
 using LivoxMsgConstPtr = LivoxMsg::ConstSharedPtr;
 using PointCloud2Publisher = rclcpp::Publisher<PointCloud2Msg>::SharedPtr;
+using PathPublisher = rclcpp::Publisher<PathMsg>::SharedPtr;
 using ImuSubscriber = rclcpp::Subscription<ImuMsg>::SharedPtr;
 using PointCloud2Subscriber = rclcpp::Subscription<PointCloud2Msg>::SharedPtr;
 using LivoxSubscriber = rclcpp::Subscription<LivoxMsg>::SharedPtr;
@@ -132,6 +145,9 @@ inline typename rclcpp::Subscription<T>::SharedPtr create_sensor_subscriber(
 }
 
 inline void ros_publish(const PointCloud2Publisher &publisher, const PointCloud2Msg &message) {
+  publisher->publish(message);
+}
+inline void ros_publish(const PathPublisher &publisher, const PathMsg &message) {
   publisher->publish(message);
 }
 

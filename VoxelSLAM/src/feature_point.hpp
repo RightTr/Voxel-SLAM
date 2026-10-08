@@ -3,13 +3,46 @@
 
 #include "ros_utils.h"
 #include <pcl_conversions/pcl_conversions.h>
-#include "ros_utils.h"
-#include "ros_utils.h"
+#include <algorithm>
+#include <cmath>
+#include <cstdint>
 
 typedef pcl::PointXYZINormal PointType;
 using namespace std;
 
-enum LID_TYPE{LIVOX, VELODYNE, OUSTER, HESAI, ROBOSENSE, TARTANAIR};
+enum LID_TYPE
+{
+  LIVOX = 0,
+  VELODYNE = 1,
+  OUSTER = 2,
+  HESAI = 3,
+  ROBOSENSE = 4,
+  TARTANAIR = 5,
+  LIVOX_PCL2 = 8 // Livox PointCloud2, matching FAST-LIO-SAM lidar_type 8
+};
+
+namespace livox_ros2
+{
+  struct EIGEN_ALIGN16 Point
+  {
+    PCL_ADD_POINT4D;
+    float intensity;
+    std::uint8_t tag;
+    std::uint8_t line;
+    double timestamp;
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  };
+}
+
+POINT_CLOUD_REGISTER_POINT_STRUCT(livox_ros2::Point,
+  (float, x, x)
+  (float, y, y)
+  (float, z, z)
+  (float, intensity, intensity)
+  (std::uint8_t, tag, tag)
+  (std::uint8_t, line, line)
+  (double, timestamp, timestamp)
+)
 
 namespace velodyne_ros {
   struct EIGEN_ALIGN16 Point {
@@ -111,6 +144,10 @@ public:
     double t0 = ros_time_sec(msg->header.stamp);
     switch(lidar_type)
     {
+    case LIVOX_PCL2:
+      livox_pcl2_handler(msg, pl_full);
+      break;
+
     case VELODYNE:
       velodyne_handler(msg, pl_full);
       break;
@@ -164,6 +201,48 @@ public:
 
     }
 
+  }
+
+  void livox_pcl2_handler(const PointCloud2MsgConstPtr &msg, pcl::PointCloud<PointType> &pl_full)
+  {
+    pcl::PointCloud<livox_ros2::Point> pl_orig;
+    pcl::fromROSMsg(*msg, pl_orig);
+    if (pl_orig.empty()) return;
+
+    const double timestamp_head = pl_orig.points.front().timestamp;
+    const int point_stride = std::max(point_filter_num, 1);
+    pl_full.reserve((pl_orig.size() + point_stride - 1) / point_stride);
+
+    for (size_t i = 0; i < pl_orig.size(); ++i)
+    {
+      if (i % point_stride != 0) continue;
+
+      const auto &pt = pl_orig.points[i];
+      if (!std::isfinite(pt.x) || !std::isfinite(pt.y) || !std::isfinite(pt.z) ||
+          !std::isfinite(pt.timestamp))
+        continue;
+
+      const double distance_squared = static_cast<double>(pt.x) * pt.x +
+                                      static_cast<double>(pt.y) * pt.y +
+                                      static_cast<double>(pt.z) * pt.z;
+      if (distance_squared <= blind * blind) continue;
+
+      PointType point{};
+      point.x = pt.x;
+      point.y = pt.y;
+      point.z = pt.z;
+      point.intensity = pt.intensity;
+      point.normal_x = 0;
+      point.normal_y = 0;
+      point.normal_z = 0;
+      // Livox PointCloud2 stores timestamp as nanoseconds from scan start;
+      // Voxel-SLAM's motion compensation uses seconds in curvature.
+      point.curvature = static_cast<float>((pt.timestamp - timestamp_head) * 1e-9);
+      pl_full.push_back(point);
+    }
+
+    std::sort(pl_full.points.begin(), pl_full.points.end(),
+      [](const PointType &a, const PointType &b) { return a.curvature < b.curvature; });
   }
 
   void velodyne_handler(const PointCloud2MsgConstPtr &msg, pcl::PointCloud<PointType> &pl_full)

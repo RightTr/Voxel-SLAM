@@ -33,15 +33,16 @@ find_package(Threads REQUIRED)
 if(ROS_EDITION STREQUAL "ROS1")
   add_compile_definitions(USE_ROS1)
   find_package(catkin REQUIRED COMPONENTS
-    roscpp sensor_msgs geometry_msgs std_msgs pcl_conversions tf livox_ros_driver2)
+    roscpp sensor_msgs geometry_msgs nav_msgs std_msgs pcl_conversions tf livox_ros_driver2)
   catkin_package(CATKIN_DEPENDS
-    roscpp sensor_msgs geometry_msgs std_msgs pcl_conversions tf livox_ros_driver2
+    roscpp sensor_msgs geometry_msgs nav_msgs std_msgs pcl_conversions tf livox_ros_driver2
     DEPENDS Eigen3 PCL GTSAM)
 elseif(ROS_EDITION STREQUAL "ROS2")
   add_compile_definitions(USE_ROS2)
   find_package(ament_cmake REQUIRED)
   find_package(rclcpp REQUIRED)
   find_package(sensor_msgs REQUIRED)
+  find_package(nav_msgs REQUIRED)
   find_package(geometry_msgs REQUIRED)
   find_package(pcl_conversions REQUIRED)
   find_package(tf2_ros REQUIRED)
@@ -65,7 +66,7 @@ if(ROS_EDITION STREQUAL "ROS1")
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 else()
   ament_target_dependencies(voxelslam
-    rclcpp sensor_msgs geometry_msgs pcl_conversions tf2_ros livox_ros_driver2)
+    rclcpp sensor_msgs geometry_msgs nav_msgs pcl_conversions tf2_ros livox_ros_driver2)
   install(TARGETS voxelslam DESTINATION lib/${PROJECT_NAME})
   install(DIRECTORY launch_ROS2/
     DESTINATION share/${PROJECT_NAME}/launch)
