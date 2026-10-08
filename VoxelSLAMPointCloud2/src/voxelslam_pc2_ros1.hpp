@@ -27,8 +27,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef VOXELSLAM_PC2_H
-#define VOXELSLAM_PC2_H
+#ifndef VOXELSLAM_PC2_ROS1_HPP
+#define VOXELSLAM_PC2_ROS1_HPP
 
 #include <sensor_msgs/PointCloud2.h>
 

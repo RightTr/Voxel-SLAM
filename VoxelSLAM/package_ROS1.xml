@@ -1,18 +1,17 @@
 <?xml version="1.0"?>
-<package format="3">
+<package format="2">
   <name>voxel_slam</name>
   <version>0.0.0</version>
   <description>Voxel-SLAM LiDAR inertial mapping</description>
   <maintainer email="zhengliu1323@hotmail.com">Zheng Liu</maintainer>
   <license>Apache-2.0</license>
-  <buildtool_depend>ament_cmake</buildtool_depend>
-  <depend>rclcpp</depend>
+  <buildtool_depend>catkin</buildtool_depend>
+  <depend>roscpp</depend>
   <depend>sensor_msgs</depend>
   <depend>geometry_msgs</depend>
+  <depend>std_msgs</depend>
   <depend>pcl_conversions</depend>
-  <depend>tf2_ros</depend>
+  <depend>tf</depend>
   <depend>livox_ros_driver2</depend>
-  <exec_depend>ros2launch</exec_depend>
-  <exec_depend>rviz2</exec_depend>
-  <export><build_type>ament_cmake</build_type></export>
+  <export/>
 </package>

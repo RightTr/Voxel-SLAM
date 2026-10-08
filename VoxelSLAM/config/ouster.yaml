@@ -1,4 +1,4 @@
-feature:
+General:
   lid_topic: "/os1_cloud_node/points"
   imu_topic: "/os1_cloud_node/imu"
   save_path: "/media/zale/T7/newcollege/"
@@ -12,7 +12,7 @@ feature:
                     0, 0, 1]
   is_save_map: 0
 
-EKF:
+Odometry:
   cov_gyr: 0.01 # 0.01
   cov_acc: 1
   rdw_gyr: 0.0001
@@ -35,7 +35,7 @@ LocalBA:
   rdw_acc: 0.0001
   min_ba_point: 1
   # eigen_value_array: [16.0, 16.0, 16.0, 16.0]
-  eigen_value_array: [4.0, 4.0, 4.0, 4.0]
+  plane_eigen_value_thre: [4.0, 4.0, 4.0, 4.0]
   imu_coef: 0.0002
   thread_num: 5
 
@@ -54,4 +54,3 @@ GBA:
   min_eigen_value: 0.01
   eigen_value_array: [4.0, 4.0, 4.0, 4.0]
   total_max_iter: 6
-

@@ -6,7 +6,7 @@
 	<node pkg="voxel_slam" type="voxelslam" name="voxelslam" output="screen"> </node>
   
 	<group if="$(arg rviz)">
-		<node launch-prefix="nice" pkg="rviz" type="rviz" name="rviz" args="-d $(find voxel_slam)/rviz_cfg/back.rviz" />
+		<node launch-prefix="nice" pkg="rviz" type="rviz" name="rviz" args="-d $(find voxel_slam)/rviz_cfg/back_ros1.rviz" />
 	</group>
      
 </launch>

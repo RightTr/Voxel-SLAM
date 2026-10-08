@@ -40,7 +40,7 @@
 #include <rviz/properties/int_property.h>
 #include <rviz/validate_floats.h>
 
-#include "voxelslam_pc2.hpp"
+#include "voxelslam_pc2_ros1.hpp"
 
 namespace voxelslam_pointcloud2
 {
